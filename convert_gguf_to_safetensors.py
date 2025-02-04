@@ -24,7 +24,7 @@ def gguf_to_safetensors(gt, target_file):
 
 
 @app.command()
-def main (repo_path: str, local_dir: str):
+def main (repo_path: str, local_dir: str, download_only: bool = False):
 	segs = repo_path.split('/')
 	repo_id = '/'.join(segs[:2])
 
@@ -38,6 +38,9 @@ def main (repo_path: str, local_dir: str):
 		if not os.path.exists(gguf_path):
 			print(f'Downloading {repo_id}/{file}...')
 			gguf_path = hf_hub_download(repo_id=repo_id, filename=file, local_dir=local_dir)
+		if download_only:
+			continue
+
 		reader = gguf.GGUFReader(gguf_path)
 		print(f'Converting {gguf_path} to safetensors...')
 		gguf_to_safetensors(reader.tensors, gguf_path.replace('.gguf', '.safetensors'))
